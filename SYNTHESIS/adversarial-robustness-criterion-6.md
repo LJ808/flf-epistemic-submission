@@ -40,7 +40,7 @@ A methodology that only defends against (1) leaves half the criterion untested. 
 9. Speculative theory — can't evaluate reliability, but exposes theoretical dependencies for scrutiny
 10. Absent source information — flags omission as a choice rather than hiding it as innocent compression
 
-Worked examples for all nine claims (eggs-001/002/003, covid-001/002/003, blackhole-001/002) live in the per-claim attack-vector breakdown maintained alongside this file in session records; this document's authoritative claim is the pattern above, demonstrated across all three case shapes.
+Worked examples for all nine claims (eggs-001/002/003, covid-001/002/003, blackhole-001/002) live in [`per-claim-attack-vector-breakdown.md`](per-claim-attack-vector-breakdown.md), maintained alongside this file; this document's authoritative claim is the pattern above, demonstrated across all three case shapes.
 
 ---
 
@@ -56,7 +56,7 @@ This is the test PART A did not run. The question: when the *original source* �
 
 No — not on its own, and this needs to be stated plainly rather than softened. E-Prime forces the rewrite "Our cohort (n=X) exhibited Y inflammation marker increase," which is more specific than the original but **still doesn't surface the selection criteria if the source's own abstract omits it.** The rewrite can only force visibility of what's stated; it can't conjure what was never disclosed.
 
-**What E-Prime does instead:** It forces the question to become structurally unavoidable. By requiring a cohort size and a specific outcome metric in the same sentence as the claim, the rewrite creates a visible gap: "n=X, but who composed this cohort?" A reader applying this methodology is now structurally prompted to seek the cohort-selection information as a *named open question*, rather than accepting "our cohort" as sufflcient framing.
+**What E-Prime does instead:** It forces the question to become structurally unavoidable. By requiring a cohort size and a specific outcome metric in the same sentence as the claim, the rewrite creates a visible gap: "n=X, but who composed this cohort?" A reader applying this methodology is now structurally prompted to seek the cohort-selection information as a *named open question*, rather than accepting "our cohort" as sufficient framing.
 
 **Verdict:** E-Prime narrows source-side gaming from invisible to flagged-but-unresolved. This is a real, bounded limitation, not a success. Comparing against the three actual eggs claims in this vault: eggs-002 (Zhong/Drouin-Chartier) explicitly triggers this exact gap in its own Adversarial Interpretation section — "a source motivated to find eggs safe could select an adjustment model that systematically removes the true signal by treating mediators as confounders. Nothing in this abstract rules that out." That's the methodology naming its own blind spot on a real claim, not a hypothetical.
 

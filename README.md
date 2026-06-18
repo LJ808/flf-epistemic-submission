@@ -52,6 +52,7 @@ flf-vault/
 └── SYNTHESIS/
     ├── crux-analysis-v1.md
     ├── scalability-test-v1.md
+    ├── per-claim-attack-vector-breakdown.md         ← Part A detail, all nine claims
     └── adversarial-robustness-criterion-6.md  ← Criterion 6, both clauses tested
 ```
 
