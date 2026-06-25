@@ -24,6 +24,7 @@ No API key needed for `--demo`. With a key set (`export ANTHROPIC_API_KEY=...`),
 1. Read [`INDEX.md`](flf-vault/INDEX.md) — overview of the nine claims and the vault structure
 2. Pick one case and read 1–2 claim files to see the before/after E-Prime rewrite
 3. Skim [`adversarial-robustness-criterion-6.md`](flf-vault/SYNTHESIS/adversarial-robustness-criterion-6.md) — Part C gives the honest, non-inflated summary
+4. Skim [`literature-engagement-addendum-v1.md`](flf-vault/SYNTHESIS/literature-engagement-addendum-v1.md) — how this submission responded to two real external papers found after drafting, written in E-Prime itself
 
 ### For judges with 45 minutes
 1. Read one claim from each case (e.g., `eggs-001.md`, `covid-001.md`, `blackhole-001.md`)
@@ -53,7 +54,8 @@ flf-vault/
     ├── crux-analysis-v1.md
     ├── scalability-test-v1.md
     ├── per-claim-attack-vector-breakdown.md         ← Part A detail, all nine claims
-    └── adversarial-robustness-criterion-6.md  ← Criterion 6, both clauses tested
+    ├── adversarial-robustness-criterion-6.md  ← Criterion 6, both clauses tested
+    └── literature-engagement-addendum-v1.md   ← response to two real external papers, post-submission-draft
 ```
 
 ---

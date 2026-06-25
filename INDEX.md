@@ -13,6 +13,7 @@ Real Obsidian vault, built from 9 actually-executed E-Prime ingestion runs acros
 - [[insight-contribution-v1]] — the hidden-dependency typology, the falsifiable scope-dependency prediction, and its confirmed-with-refinement result
 - [[crux-analysis-v1]] — ranked cruxes, missing-perspectives report, rhetoric-vs-evidence report, run across all 9 claims
 - [[adversarial-robustness-criterion-6]] — 10 attack vectors per claim across reader-side and source-side gaming, Criterion 6
+- [[literature-engagement-addendum-v1]] — response to two real external papers bearing on the E-Prime mechanism, found after the original submission; proposes a two-layer generation/disclosure architecture
 
 ### Sources (primary material ingested)
 - [[li-2013-meta-analysis]]
