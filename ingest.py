@@ -1,21 +1,58 @@
+---
+title: Ingest
+type: code
+status: active
+vault: TRC
+date: 2026-06-30
+tags: []
+---
+
 #!/usr/bin/env python3
 """
-E-Prime Ingestion Tool — FLF Submission
-=========================================
+E-Prime Ingestion + Assessment Tool — FLF Submission
+=====================================================
 
-QUICK START (one command, after setting your API key):
+Two-layer architecture (revised 2026-06-30, after FLF early-feedback review
+named the original single-pass version "rhetoric linting" -- ingestion and
+assessment fused with no separable structure or checking step):
+
+    Ingestion Layer  -- ingest_claim()  -- mechanical E-Prime rewrite only
+    Assessment Layer -- assess_claim()  -- takes Ingestion Layer output as
+                                            its required input, runs the
+                                            checkable analysis/ambiguity/
+                                            adversarial pass against it
+
+See SYNTHESIS/two-layer-architecture-v1.md for the assessment-layer criteria
+each Assessment output must satisfy.
+
+NOTE ON A SECOND, DIFFERENT "TWO-LAYER" PROPOSAL: literature-engagement-
+addendum-v1.md separately proposes a generation/disclosure split -- a shallow
+filler-word ban for generation-stage synthesis (per Jehu-Appiah 2026), E-Prime
+reserved for disclosure-stage rewriting. That split cuts along a different
+axis than the Ingestion/Assessment split above, and the addendum named it as
+an untested, falsifiable proposal, not yet built. This file's
+COMPARE-FILLER-BAN HARNESS section below builds the apparatus for that test --
+it does not run it. No ANTHROPIC_API_KEY exists in the environment that wrote
+this; running the comparison and reporting a real result counts as next-steps work,
+named explicitly in the submission as something this proposal would execute
+if it advances.
+
+QUICK START:
 
     pip install -r requirements.txt
     export ANTHROPIC_API_KEY=your_key_here
     python3 ingest.py "There is a positive association between egg consumption and CVD risk"
 
-Fixed-prompt ingestion: takes a source claim and produces an E-Prime rewrite
-in YAML-formatted claim record matching the vault schema used throughout
-flf-vault/CLAIMS/. Same prompt, zero per-source tuning — this is the
-mechanical layer that produced all nine claim records in this vault.
+    # Run the Ingestion Layer alone, no Assessment Layer call:
+    python3 ingest.py --ingest-only "There is a positive association..."
 
-No API key? Run with --demo to see a pre-recorded example output instead
-of making a live API call.
+    # Run the generation/disclosure comparison harness (needs a real API key --
+    # the falsifiable test literature-engagement-addendum-v1.md names
+    # as unresolved; --demo shows pre-recorded illustrative output instead):
+    python3 ingest.py --compare-filler-ban "There is a positive association..."
+
+No API key? Run with --demo to see pre-recorded output from all modes
+without making a live call.
 """
 
 import argparse
@@ -25,13 +62,19 @@ import sys
 
 import yaml
 
-# The fixed ingestion prompt — identical for every source, every case.
-FIXED_PROMPT = """You are an E-Prime ingestion system. Given an original claim or quote from a source, produce:
+# ---------------------------------------------------------------------------
+# INGESTION LAYER -- mechanical only. No interpretation, no flagged ambiguity,
+# no adversarial reading. Same prompt, zero per-source tuning.
+# ---------------------------------------------------------------------------
 
-1. An E-Prime rewrite that eliminates "is/are/was/were/be/being/been" and forces numerical/structural specificity
-2. Analysis of what the rewrite exposes that the original hid
-3. Ambiguity flags — gaps that neither the original nor the rewrite resolve
-4. Adversarial Interpretation — how a motivated reader could misuse this claim despite the rewrite
+INGESTION_PROMPT = """You are an E-Prime ingestion system. Given an original claim or quote from a source, produce only:
+
+1. The verbatim original quote
+2. An E-Prime rewrite that eliminates "is/are/was/were/be/being/been" and forces numerical/structural specificity into the sentence
+
+Do not analyze, flag ambiguity, or interpret. This is a mechanical pass only --
+the rewrite must preserve the source's actual content while removing every
+form of "to be."
 
 Output as valid YAML only. No markdown fences. No preamble.
 
@@ -42,26 +85,94 @@ original_quote: |
 
 e_prime_rewrite: |
   [rewritten without any form of "to be", with numbers and specifics forced into view]
-
-analysis: |
-  [2-3 sentences: what does the rewrite expose? what was hidden in "is"? what gap does it reveal?]
-
-ambiguity_flags: |
-  [What questions remain even after the rewrite? What information is still missing from the source?]
-
-adversarial_interpretation: |
-  [How could a motivated reader misuse this claim despite the rewrite? What attack surface remains?]
-
-confidence_assessment: |
-  [Integer 1-5. 5 = motivated misreading now requires visibly adding language. 1 = rewrite barely changes readability.]
 """
 
-DEMO_OUTPUT = {
+DEMO_INGESTION_OUTPUT = {
     "original_quote": "There is a dose-response positive association between egg consumption and the risk of CVD and diabetes",
     "e_prime_rewrite": "Egg intake correlates with CVD risk at RR 1.19 (CI 1.02-1.38) and diabetes at RR 1.68 (CI 1.41-2.00), pooled across 14 studies, n=320,778.",
+}
+
+# ---------------------------------------------------------------------------
+# ASSESSMENT LAYER -- takes an Ingestion Layer output as required input.
+# Runs the checkable analysis/ambiguity/adversarial pass against it. See
+# SYNTHESIS/two-layer-architecture-v1.md for the three pass/fail criteria
+# this prompt encodes.
+#
+# Two prompt variants exist: an unconstrained default, and a filler-word-
+# banned variant for the comparison harness below. The Assessment Layer's
+# prose counts as generation-stage work under literature-engagement-
+# addendum-v1.md's framing (new synthesis, not a rewrite of an existing
+# claim) -- which is exactly why the addendum's generation/disclosure
+# distinction applies here and not to the Ingestion Layer above.
+# ---------------------------------------------------------------------------
+
+ASSESSMENT_PROMPT = """You are an E-Prime assessment system. You receive an
+Ingestion Layer output (an original quote plus its E-Prime rewrite) and run
+three checks against it. You do not alter the ingestion output. Produce:
+
+1. Analysis -- name the specific word or phrase the E-Prime constraint forced
+   out of the original sentence, then state what that word was hiding (a
+   missing number, mechanism, or direction of causation). Gesturing at "more
+   nuance" without naming the hidden item fails this check.
+2. Ambiguity Flags -- state what neither the original source nor the rewrite
+   resolves. A gap the rewrite itself already answers does not belong here.
+3. Adversarial Interpretation -- give two readings: how a reader motivated to
+   dismiss the claim could misuse the rewrite, and how a reader motivated to
+   accept it could misuse the rewrite. One-sided answers fail this check.
+4. Confidence Assessment -- integer 1-5. 5 = motivated misreading now requires
+   visibly adding language. 1 = rewrite barely changes readability.
+
+Output as valid YAML only. No markdown fences. No preamble.
+
+Schema:
+-------
+analysis: |
+  [names the specific hidden item; 2-3 sentences]
+
+ambiguity_flags: |
+  [gaps surviving the rewrite intact, not gaps the rewrite already closed]
+
+adversarial_interpretation: |
+  [both a dismiss-motivated and an accept-motivated misreading]
+
+confidence_assessment: |
+  [integer 1-5]
+
+Ingestion Layer output to assess:
+---------------------------------
+original_quote: {original_quote}
+
+e_prime_rewrite: {e_prime_rewrite}
+"""
+
+# Filler-word list matches Jehu-Appiah (2026)'s description of its weakest-
+# logical-content condition: words carrying no logical-inference role at all
+# (the paper names "very" and "just" directly as examples; the rest below
+# extend the same category -- intensifiers/hedges with no inferential work).
+FILLER_BAN_WORDS = (
+    "very", "just", "really", "actually", "basically",
+    "literally", "essentially", "simply", "quite", "rather",
+)
+
+ASSESSMENT_PROMPT_FILLER_BANNED = ASSESSMENT_PROMPT + """
+
+Additional constraint on this response: do not use any of the following
+words anywhere in your output: """ + ", ".join(f'"{w}"' for w in FILLER_BAN_WORDS) + """.
+This is a vocabulary ban only -- it does not require E-Prime. Write naturally
+within that restriction.
+"""
+
+DEMO_ASSESSMENT_OUTPUT = {
     "analysis": "The rewrite forces a number into a sentence that originally needed none. 'There is an association' cannot survive E-Prime without specifying direction, magnitude, and confidence interval, which become mandatory rather than optional once 'is' disappears.",
     "ambiguity_flags": "'Association' leaves causal direction unaddressed -- neither the source nor the rewrite resolves whether egg consumption causes CVD or reflects a shared upstream factor.",
     "adversarial_interpretation": "A reader motivated to dismiss this finding could note the pooled analysis lacks the same covariate adjustment as competing cohort studies. A reader motivated to accept it could ignore that 'dose-response' oversells what a highest-vs-lowest comparison shows.",
+    "confidence_assessment": 4,
+}
+
+DEMO_ASSESSMENT_OUTPUT_FILLER_BANNED = {
+    "analysis": "The rewrite replaces 'there is an association' with a directional, numbered claim. The original sentence stated no magnitude and no confidence interval; the rewrite supplies both, because E-Prime cannot carry 'is' without naming what stands behind it.",
+    "ambiguity_flags": "Causal direction remains unstated. Neither the source nor the rewrite specifies whether egg consumption produces the CVD risk or whether both track a shared upstream factor.",
+    "adversarial_interpretation": "A reader who wants to dismiss this finding can point to the missing covariate adjustment, absent here and present in the competing cohort study. A reader who wants to accept it can overlook how much the dose-response framing claims, given a two-point comparison rather than a full dose curve.",
     "confidence_assessment": 4,
 }
 
@@ -77,8 +188,22 @@ def strip_markdown_fences(text: str) -> str:
     return text
 
 
-def ingest_claim(source_text: str) -> dict:
-    """Run the fixed ingestion prompt against source text via the Anthropic API."""
+def count_filler_words(text: str, word_list=FILLER_BAN_WORDS) -> dict:
+    """Compliance check for the filler-ban condition -- counts whether any
+    banned word actually leaked into a generated output, case-insensitive,
+    whole-word match only. Used by the comparison harness to verify the
+    constraint held, not assumed from the prompt alone."""
+    counts = {}
+    for word in word_list:
+        pattern = r"\b" + re.escape(word) + r"\b"
+        hits = len(re.findall(pattern, text, re.IGNORECASE))
+        if hits:
+            counts[word] = hits
+    return counts
+
+
+def _call_model(prompt: str) -> dict:
+    """Shared API call + YAML parse, used by both layers."""
     try:
         import anthropic
     except ImportError:
@@ -100,12 +225,7 @@ def ingest_claim(source_text: str) -> dict:
     message = client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=1000,
-        messages=[
-            {
-                "role": "user",
-                "content": f"{FIXED_PROMPT}\n\nSource claim to ingest:\n\n{source_text}",
-            }
-        ],
+        messages=[{"role": "user", "content": prompt}],
     )
 
     response_text = message.content[0].text
@@ -134,9 +254,69 @@ def ingest_claim(source_text: str) -> dict:
     return result
 
 
+def ingest_claim(source_text: str) -> dict:
+    """Ingestion Layer. Mechanical rewrite only -- no analysis, no ambiguity
+    flags, no adversarial reading. Returns original_quote + e_prime_rewrite."""
+    return _call_model(f"{INGESTION_PROMPT}\n\nSource claim to ingest:\n\n{source_text}")
+
+
+def assess_claim(ingestion_output: dict, filler_ban: bool = False) -> dict:
+    """Assessment Layer. Requires an Ingestion Layer output as input -- refuses
+    to run on raw source text directly, since the assessment pass checks the
+    rewrite, not the original. Returns analysis + ambiguity_flags +
+    adversarial_interpretation + confidence_assessment.
+
+    filler_ban=True selects the constrained prompt variant -- the generation-
+    stage constraint literature-engagement-addendum-v1.md proposes, distinct
+    from the Ingestion Layer's E-Prime constraint above."""
+    if "original_quote" not in ingestion_output or "e_prime_rewrite" not in ingestion_output:
+        print(
+            "assess_claim() requires an Ingestion Layer output "
+            "(original_quote + e_prime_rewrite). Run ingest_claim() first.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    template = ASSESSMENT_PROMPT_FILLER_BANNED if filler_ban else ASSESSMENT_PROMPT
+    prompt = template.format(
+        original_quote=ingestion_output["original_quote"],
+        e_prime_rewrite=ingestion_output["e_prime_rewrite"],
+    )
+    return _call_model(prompt)
+
+
+def compare_filler_ban(ingestion_output: dict) -> dict:
+    """COMPARE-FILLER-BAN HARNESS -- the falsifiable test literature-
+    engagement-addendum-v1.md names as unresolved: does a generation-stage
+    filler-word ban change what the Assessment Layer surfaces, compared to
+    an unconstrained run against the same Ingestion Layer output?
+
+    Runs assess_claim() twice against the same ingestion output -- once
+    unconstrained, once filler-banned -- and returns both outputs plus a
+    compliance check confirming the ban actually held (not assumed from the
+    prompt instruction alone). This function makes two live API calls; it
+    requires ANTHROPIC_API_KEY and is not exercised by --demo, which prints
+    pre-recorded illustrative output instead."""
+    unconstrained = assess_claim(ingestion_output, filler_ban=False)
+    filler_banned = assess_claim(ingestion_output, filler_ban=True)
+
+    compliance = {}
+    for key, text in filler_banned.items():
+        if isinstance(text, str):
+            hits = count_filler_words(text)
+            if hits:
+                compliance[key] = hits
+
+    return {
+        "unconstrained": unconstrained,
+        "filler_banned": filler_banned,
+        "filler_ban_compliance_check": compliance or "clean -- no banned words found in filler_banned output",
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="E-Prime ingestion: fixed-prompt claim extraction matching the flf-vault schema."
+        description="E-Prime ingestion + assessment: two separately-callable layers matching the flf-vault schema."
     )
     parser.add_argument(
         "source_text",
@@ -146,21 +326,64 @@ def main():
     parser.add_argument(
         "--demo",
         action="store_true",
-        help="Print a pre-recorded example output without calling the API (no key needed).",
+        help="Print pre-recorded example output from both layers, no API key needed.",
+    )
+    parser.add_argument(
+        "--ingest-only",
+        action="store_true",
+        help="Run the Ingestion Layer alone and stop -- demonstrates the layers run independently.",
+    )
+    parser.add_argument(
+        "--compare-filler-ban",
+        action="store_true",
+        help="Run the generation/disclosure comparison harness from literature-engagement-addendum-v1.md (2 live API calls). Use with --demo to see illustrative output without a key.",
     )
     args = parser.parse_args()
 
     if args.demo:
-        print(yaml.dump(DEMO_OUTPUT, default_flow_style=False, sort_keys=False))
+        if args.ingest_only:
+            print(yaml.dump(DEMO_INGESTION_OUTPUT, default_flow_style=False, sort_keys=False))
+        elif args.compare_filler_ban:
+            print("--- Ingestion Layer ---")
+            print(yaml.dump(DEMO_INGESTION_OUTPUT, default_flow_style=False, sort_keys=False))
+            print("--- Assessment Layer: unconstrained ---")
+            print(yaml.dump(DEMO_ASSESSMENT_OUTPUT, default_flow_style=False, sort_keys=False))
+            print("--- Assessment Layer: filler-banned ---")
+            print(yaml.dump(DEMO_ASSESSMENT_OUTPUT_FILLER_BANNED, default_flow_style=False, sort_keys=False))
+            print("--- Compliance check (filler-banned output) ---")
+            print("(demo mode -- not computed against real model output)")
+        else:
+            print("--- Ingestion Layer ---")
+            print(yaml.dump(DEMO_INGESTION_OUTPUT, default_flow_style=False, sort_keys=False))
+            print("--- Assessment Layer ---")
+            print(yaml.dump(DEMO_ASSESSMENT_OUTPUT, default_flow_style=False, sort_keys=False))
         return
 
     if not args.source_text:
         parser.print_help()
         sys.exit(1)
 
-    print("Running E-Prime ingestion...", file=sys.stderr)
-    claim_data = ingest_claim(args.source_text)
-    print(yaml.dump(claim_data, default_flow_style=False, sort_keys=False))
+    print("Running Ingestion Layer...", file=sys.stderr)
+    ingestion_result = ingest_claim(args.source_text)
+    print(yaml.dump(ingestion_result, default_flow_style=False, sort_keys=False))
+
+    if args.ingest_only:
+        return
+
+    if args.compare_filler_ban:
+        print("Running Assessment Layer comparison (unconstrained + filler-banned)...", file=sys.stderr)
+        comparison = compare_filler_ban(ingestion_result)
+        print("--- Assessment Layer: unconstrained ---")
+        print(yaml.dump(comparison["unconstrained"], default_flow_style=False, sort_keys=False))
+        print("--- Assessment Layer: filler-banned ---")
+        print(yaml.dump(comparison["filler_banned"], default_flow_style=False, sort_keys=False))
+        print("--- Compliance check (filler-banned output) ---")
+        print(comparison["filler_ban_compliance_check"])
+        return
+
+    print("Running Assessment Layer...", file=sys.stderr)
+    assessment_result = assess_claim(ingestion_result)
+    print(yaml.dump(assessment_result, default_flow_style=False, sort_keys=False))
 
 
 if __name__ == "__main__":

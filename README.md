@@ -1,8 +1,19 @@
+---
+title: Readme
+type: reference
+status: active
+vault: TRC
+date: 2026-06-28
+tags: [resilience]
+---
+
 # FLF Epistemic Case Study Submission
 ## E-Prime as Structural Epistemic Enforcement
 
 **Case studies:** Eggs/CVD/Diabetes · COVID Origins · Black Holes/LHC Safety
 **Core contribution:** E-Prime as a detection-and-disclosure mechanism for evaluative-language smuggling, tested for both reader-side misreading and source-side gaming across three structurally different epistemic domains.
+
+**Architecture, revised 2026-06-30:** Each claim runs through two separable layers, per FLF early-feedback review (Oly Sourbut) — an Ingestion Layer (mechanical E-Prime rewrite, no interpretation) and an Assessment Layer (the checkable nuance-restoration/ambiguity/adversarial-reading pass, run against the ingestion output under stated criteria). See [`two-layer-architecture-v1.md`](flf-vault/SYNTHESIS/two-layer-architecture-v1.md) for the assessment criteria and [`ingest.py`](flf-vault/ingest.py) for the two layers running as separately-callable functions.
 
 ---
 
@@ -56,25 +67,28 @@ flf-vault/
     ├── per-claim-attack-vector-breakdown.md         ← Part A detail, all nine claims
     ├── adversarial-robustness-criterion-6.md  ← Criterion 6, both clauses tested
     └── literature-engagement-addendum-v1.md   ← response to two real external papers, post-submission-draft
+    └── two-layer-architecture-v1.md            ← ingestion/assessment split + assessment criteria, post-submission-draft
 ```
 
 ---
 
 ## The Core Claim, Stated Honestly
 
-**E-Prime ingestion makes evaluative-language smuggling structurally visible — it does not make misreading or source gaming impossible.**
+**E-Prime ingestion makes evaluative-language smuggling structurally visible. It does not make misreading or source gaming impossible.**
 
-Standard-summary language ("is," "seems," "means," "no evidence of") permits the actual epistemic work — confounding decisions, statistical power, theory-choice, source incentive — to collapse invisibly into a confident-sounding sentence. E-Prime forces that work into view. A motivated reader or a motivated source can still attempt to mislead; the difference is that doing so now requires adding visible language or leaving a visible gap, rather than hiding inside a verb.
+Standard-summary language hides real epistemic work behind a confident-sounding sentence. Words like "is," "seems," "means," and "no evidence of" let a writer skip past confounding decisions, statistical power, theory-choice, or source incentive without naming any of them. E-Prime forces that work back into view.
 
-This submission tested that claim against ten reader-side attack classes across all nine claims, and three source-side gaming scenarios (cohort selection, rhetorical engineering, institutional hedge-then-reassure) across all three cases. Results, including the places where the method does *not* fully hold, are in `adversarial-robustness-criterion-6.md`.
+A motivated reader or a motivated source can still try to mislead. The real change: doing so now requires adding visible language or leaving a visible gap, instead of hiding inside a verb.
+
+This submission tested that claim two ways: ten reader-side attack classes across all nine claims, and three source-side gaming scenarios (cohort selection, rhetorical engineering, institutional hedge-then-reassure) across all three cases. `adversarial-robustness-criterion-6.md` holds the results, including the places where the method does *not* fully hold.
 
 ---
 
 ## Honest Gaps (Stated, Not Hidden)
 
-- **Secondary/tertiary sources throughout.** All three cases ingested a meta-analysis abstract, a journalist's debate writeup, or an institutional FAQ — not primary data, full transcripts, or the full LSAG 2008 safety report. This is a build-scope limitation, not a method limitation.
+- **Secondary/tertiary sources throughout.** All three cases ingested a meta-analysis abstract, a journalist's debate writeup, or an institutional FAQ — not primary data, full transcripts, or the full LSAG 2008 safety report. The build scope causes this limitation, not the method.
 - **Cross-document source-gaming untested.** Criterion 6 testing shows E-Prime defeats false-independence framing *within* a document (blackhole-002) but cannot, on its own, catch selective omission *across* documents the vault never ingested (the public FAQ vs. the fuller LSAG report).
-- **Three open cruxes, not resolved:** whether PREDIMED's null interaction reflects true absence or underpowering (eggs-003); whether post-2019 computational tractability says anything about pre-2019 engineering knowability (covid-003); which CERN safety argument actually carries the weight (blackhole-002). These are named as the vault's real, current open questions — not papered over.
+- **Three open cruxes, not resolved:** whether PREDIMED's null interaction reflects true absence or underpowering (eggs-003); whether post-2019 computational tractability says anything about pre-2019 engineering knowability (covid-003); which CERN safety argument actually carries the weight (blackhole-002). This file names them as the vault's real, current open questions, not papered-over ones.
 - **Judgment-scales-with-compute claim:** drafted during the scalability test, caught as unexecuted before shipping, corrected to state the gap honestly.
 
 ---

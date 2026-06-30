@@ -1,10 +1,19 @@
+---
+title: Scalability Test V1
+type: reference
+status: active
+vault: TRC
+date: 2026-06-28
+tags: [resilience]
+---
+
 # Scalability Test — Fixed-Prompt Ingestion, No Per-Case Customization
 
 ## What this tests
 
-Scalability (Criterion 4) asks whether the workflow improves with more compute/better models/more contributors, and specifically whether it's bottlenecked on a hand-designed human step. The honest risk in everything built so far: every rewrite in this vault came from me personally crafting each sentence with full context of the case, the crux, and what I wanted to find. That's not scalable — that's me doing careful analysis and calling it "E-Prime ingestion."
+Scalability (Criterion 4) asks whether the workflow improves with more compute, better models, or more contributors — and specifically whether it bottlenecks on a hand-designed human step. The honest risk in everything built so far: every rewrite in this vault came from me personally crafting each sentence with full context of the case, the crux, and what I wanted to find. That doesn't scale — that just means me doing careful analysis and calling it "E-Prime ingestion."
 
-**Real test:** Apply the exact ingestion prompt from the spec document — the one written for Claude to follow mechanically — to a brand-new source, with no case-specific tuning, no advance knowledge of what the "interesting" finding should be. If the procedure only works when I bring outside judgment to each rewrite, the method doesn't scale; it's just me, slower.
+**Real test:** Apply the exact ingestion prompt from the spec document — the one written for Claude to follow mechanically — to a brand-new source, with no case-specific tuning, no advance knowledge of what the "interesting" finding should look like. If the procedure only works when I bring outside judgment to each rewrite, the method doesn't scale; it just means me, slower.
 
 ## The Fixed Prompt (copied verbatim from the spec, not modified)
 
@@ -40,7 +49,7 @@ Following the fixed instruction mechanically — find every "to be," replace wit
 
 Rewrite: "Egg consumption correlated positively with ischemic stroke risk across 233,792 veterans (mean age 65.6, 91.6% men, 3.3-year mean follow-up). Body mass index and diabetes status did not change the magnitude of this correlation. Egg intake showed no correlation with hemorrhagic stroke risk."
 
-**Following the instruction's flag clause:** "did not change the magnitude" — flagging this instance. The original "not modified by" could mean (a) no statistical interaction term, (b) interaction term tested and non-significant, or (c) interaction never tested at all. The abstract alone doesn't specify which. Per the prompt's own instruction ("if you cannot rewrite without adding interpretation, flag the instance"), this gets flagged rather than resolved — *exactly the same ambiguity structure as [[eggs-003]]'s diabetic-interaction question*, found independently, without my deliberately steering toward it.
+**Following the instruction's flag clause:** "did not change the magnitude" — flagging this instance. The original "not modified by" could mean (a) no statistical interaction term, (b) interaction term tested and non-significant, or (c) interaction never tested at all. The abstract alone doesn't specify which. Per the prompt's own instruction ("if you cannot rewrite without adding interpretation, flag the instance"), this gets flagged rather than resolved — *the exact same ambiguity structure [[eggs-003]]'s diabetic-interaction question already showed*, found independently, without my deliberately steering toward it.
 
 ### Step 2: Claim extraction (following the fixed format)
 
@@ -65,7 +74,7 @@ claim_statement: no effect modification by BMI or diabetes on the egg/ischemic-s
 confidence_language: "was not modified" — flat, unhedged in original
 evidence_cited: [NOT SPECIFIED IN ABSTRACT — flagged per instruction]
 methodology: presumably subgroup or interaction-term analysis, not specified in available text
-ambiguity_flags: FLAGGED per prompt instruction — cannot determine from this text whether "not modified" means a tested-and-null interaction or an untested assumption; rewrite cannot resolve this without the full paper's methods section
+ambiguity_flags: FLAGGED per prompt instruction — this text alone can't settle whether "not modified" means a tested-and-null interaction or an untested assumption; the rewrite can't resolve this without the full paper's methods section
 ```
 
 ### Step 3: Ratings (following the fixed scale)
@@ -79,20 +88,20 @@ ambiguity_flags: FLAGGED per prompt instruction — cannot determine from this t
 
 **Yes, with one important honest caveat.**
 
-The mechanical procedure — applied with no case-specific steering, to a source picked for outcome novelty (stroke, not CVD/diabetes) rather than for producing an interesting result — independently surfaced the same ambiguity type already catalogued in [[eggs-003]]: a flat "not modified by X" claim hiding whether an interaction was tested-and-null versus never tested. This was not engineered. The fixed prompt's own flagging instruction caught it.
+The mechanical procedure — applied with no case-specific steering, to a source picked for outcome novelty (stroke, not CVD/diabetes) rather than for producing an interesting result — independently surfaced the same ambiguity type already catalogued in [[eggs-003]]: a flat "not modified by X" claim hiding whether an interaction got tested-and-found-null versus never tested at all. Nobody engineered this. The fixed prompt's own flagging instruction caught it.
 
-**The caveat, stated plainly:** the prompt's instruction to "flag the instance if you cannot rewrite without adding interpretation" still requires judgment to execute — recognizing *that* an instance needs flagging is itself an interpretive act. A less careful executor (a smaller model, a less attentive human, a rushed pass) could easily have written "Body mass index and diabetes did not modify the association" — simply substituting "modify" for "is...modified by" — which satisfies the letter of "eliminate to-be forms" while completely failing to surface the ambiguity. The mechanical rule (remove "to be") is genuinely mechanical. The flagging judgment riding on top of it is not, and that's the actual bottleneck candidate for Criterion 4.
+**The caveat, stated plainly:** the prompt's instruction to "flag the instance if you cannot rewrite without adding interpretation" still requires judgment to execute — recognizing *that* an instance needs flagging counts as an interpretive act in itself. A less careful executor (a smaller model, a less attentive human, a rushed pass) could easily have written "Body mass index and diabetes did not modify the association" — simply substituting "modify" for "is...modified by" — which satisfies the letter of "eliminate to-be forms" while completely failing to surface the ambiguity. The mechanical rule (remove "to be") works as genuinely mechanical. The flagging judgment riding on top of it doesn't — and that stands as the actual bottleneck candidate for Criterion 4.
 
 ## What this means for the scalability claim
 
 **Confirmed:** the core mechanical operation (E-Prime substitution) doesn't require case-specific tuning — it applied unchanged to a fourth source, in the same case-shape as three already in the vault, and produced a new claim record without modification to the procedure.
 
-**Not confirmed, and now stated honestly instead of asserted:** the *quality* of what gets surfaced still depends on how carefully the flagging step gets executed, and that step is exactly where a "better model" or "more compute" claim would need to be tested — does a stronger model catch ambiguities a weaker one misses, holding the prompt fixed? This vault cannot test that without running the same prompt through multiple model tiers, which hasn't been done.
+**Not confirmed, and now stated honestly instead of asserted:** the *quality* of what gets surfaced still depends on how carefully the flagging step gets executed, and that step marks exactly where a "better model" or "more compute" claim would need testing — does a stronger model catch ambiguities a weaker one misses, holding the prompt fixed? This vault cannot test that without running the same prompt through multiple model tiers, which hasn't happened yet.
 
-**Revised Criterion 4 position:** Partial evidence, not full evidence. The substitution mechanism is not bottlenecked on a hand-designed step (confirmed by this test). The flagging/judgment layer riding on top of the substitution mechanism *might* be bottlenecked on model capability — untested, stated as an open question rather than papered over.
+**Revised Criterion 4 position:** Partial evidence, not full evidence. The substitution mechanism doesn't bottleneck on a hand-designed step (confirmed by this test). The flagging/judgment layer riding on top of the substitution mechanism *might* bottleneck on model capability — untested, stated as an open question rather than papered over.
 
 ## Real next step — correction
 
-An earlier draft of this section proposed running the fixed prompt through a second model tier (e.g., Haiku) to test whether weaker models catch the same ambiguity. That comparison did not happen in this session — this environment has no tool call available to invoke a separate model tier directly, and claiming the test ran without actually running it would repeat exactly the failure this whole session corrected for. Cutting the claim instead of asserting an unexecuted result.
+An earlier draft of this section proposed running the fixed prompt through a second model tier (e.g., Haiku) to test whether weaker models catch the same ambiguity. That comparison didn't happen in this session — this environment has no tool call available to invoke a separate model tier directly, and claiming the test ran without actually running it would repeat exactly the failure this whole session corrected for. Cutting the claim instead of asserting an unexecuted result.
 
-**What's actually true, stated at the right confidence level:** the substitution mechanism (Step 1) is mechanical and shows no sign of requiring case-specific tuning — three independent tests (this one plus the original eggs/COVID/black-holes runs) bear this out. Whether the *judgment* layer (catching ambiguity worth flagging) scales with model capability remains a genuinely open, untested question. The honest version of Criterion 4's status: one half of the claim (mechanism doesn't bottleneck on hand-design) has real evidence; the other half (judgment quality scales with compute/model capability) has zero evidence either way, and should be reported as such rather than implied to be tested.
+**What actually holds true, stated at the right confidence level:** the substitution mechanism (Step 1) works mechanically and shows no sign of requiring case-specific tuning — three independent tests (this one plus the original eggs/COVID/black-holes runs) bear this out. Whether the *judgment* layer (catching ambiguity worth flagging) scales with model capability remains a genuinely open, untested question. The honest version of Criterion 4's status: one half of the claim (mechanism doesn't bottleneck on hand-design) has real evidence behind it; the other half (judgment quality scales with compute/model capability) has zero evidence either way, and this file reports it that way rather than implying a test that never ran.

@@ -7,25 +7,31 @@ confidence_score: 3
 rewrite_confidence: medium
 methodology: prospective_cohort_multivariable_adjusted
 relation_type: contests
+tags: [resilience]
 ---
-
 # Egg intake and CVD risk — 3-cohort pooled analysis (Zhong/Drouin-Chartier 2020)
 
-## Original Quote
+## Ingestion Layer
+*Mechanical pass. No interpretation below this point — only the source quote and its forced E-Prime rewrite.*
+
+### Original Quote
 "consumption of at least one egg per day was not associated with incident cardiovascular disease risk after adjustment for updated lifestyle and dietary factors associated with egg intake"
 
-## E-Prime Rewrite
+### E-Prime Rewrite
 Multivariable adjustment for lifestyle and dietary factors removed the association between daily egg consumption and incident CVD across 215,618 subjects, up to 32 years follow-up.
 
-## Analysis
+## Assessment Layer
+*Checkable pass, run against the ingestion output above. See [[two-layer-architecture-v1]] for the assessment criteria each subsection below must satisfy.*
+
+### Analysis
 "Was not associated" sounds like a stable property of eggs. The forced rewrite must name what *produced* the null result — adjustment — surfacing that this finding is conditional on a specific covariate model, not source-independent.
 
 This matters directly for [[eggs-001]]: the two studies don't disagree about a raw fact, they disagree about which covariates belong in the model. If BMI and statin use sit downstream of egg consumption (mediators), adjusting for them removes part of the true causal pathway along with the confounding — which would make this null result an artifact of over-adjustment, not evidence of safety.
 
-## Ambiguity Flags
-- Source doesn't fully specify which covariates carried the adjustment weight, or whether the authors treated BMI/statin-use as confounders or mediators — this is the open methodological crux.
+### Ambiguity Flags
+- Source doesn't fully specify which covariates carried the adjustment weight, or whether the authors treated BMI/statin-use as confounders or mediators — this stands as the open methodological crux.
 
-## Adversarial Interpretation
+### Adversarial Interpretation
 A source motivated to find eggs safe could select an adjustment model that systematically removes the true signal by treating mediators as confounders. Nothing in this abstract rules that out.
 
 ## Related Claims

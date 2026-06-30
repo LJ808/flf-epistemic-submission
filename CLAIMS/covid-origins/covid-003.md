@@ -7,25 +7,31 @@ confidence_score: 4
 rewrite_confidence: high
 methodology: knowability_at_time_t_argument
 relation_type: crux_candidate
+tags: [resilience]
 ---
-
 # Furin cleavage site knowability argument (Peter, zoonosis side)
 
-## Original Quote
+## Ingestion Layer
+*Mechanical pass. No interpretation below this point — only the source quote and its forced E-Prime rewrite.*
+
+### Original Quote
 "COVID's furin cleavage site is a mess... a bizarre furin cleavage site which no human has ever used before, and which virologists expected to work poorly."
 
-## E-Prime Rewrite
+### E-Prime Rewrite
 No published gain-of-function study used the PRRAR sequence before COVID's emergence; computational modeling after COVID's emergence found PRRAR functions adequately as a furin cleavage site, a finding unavailable to any engineer working before 2019.
 
-## Analysis
-"Is a mess" and "expected to work poorly" read as evaluative judgments wearing a factual costume. Forcing the rewrite requires specifying *who* expected this and *when* — exposing that this is fundamentally an argument about what was *knowable* at the time of an alleged engineering act, not an argument about the sequence's properties in isolation.
+## Assessment Layer
+*Checkable pass, run against the ingestion output above. See [[two-layer-architecture-v1]] for the assessment criteria each subsection below must satisfy.*
+
+### Analysis
+"Is a mess" and "expected to work poorly" read as evaluative judgments wearing a factual costume. Forcing the rewrite requires specifying *who* expected this and *when* — exposing that this argument fundamentally concerns what stood knowable at the time of an alleged engineering act, not the sequence's properties in isolation.
 
 This matters because the standard summary's gloss ("shows signs of artificial insertion") inverts the argument's actual direction. Peter's real point, once forced into E-Prime, runs the opposite way: the sequence looks unlike anything a contemporary (2019) engineer would have *chosen*, which argues against artificial origin, not for it. A careless paraphrase here doesn't just compress the claim — it flips which side the evidence supports.
 
-## Ambiguity Flags
-- Standard-summary inversion risk is the dominant concern here, more than any ambiguity in the rewrite itself.
+### Ambiguity Flags
+- Standard-summary inversion risk dominates here, more than any ambiguity in the rewrite itself.
 
-## Adversarial Interpretation
+### Adversarial Interpretation
 Both debate sides treat this as load-bearing (per Yuri/Saar's counter-argument that the engineers might have deliberately chosen non-standard features to imitate nature). The crux: does post-hoc computational tractability count as evidence the engineers couldn't have known it would work, or does it just mean current models haven't found the engineers' actual reasoning?
 
 ## Related Claims

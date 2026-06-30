@@ -4,8 +4,8 @@ type: institutional_faq
 citation: "CERN. 'Are LHC collisions safe?' and 'Can the LHC create a black hole?' Large Hadron Collider FAQ, home.cern."
 url: "https://home.cern/science/accelerators/large-hadron-collider"
 case: black-holes
+tags: [resilience]
 ---
-
 # CERN official LHC FAQ — safety section
 
 Official CERN position on LHC collision safety, citing the LSAG 2008 safety report (independently reviewed by the American Physical Society, UK Institute of Physics, German Physical Society).

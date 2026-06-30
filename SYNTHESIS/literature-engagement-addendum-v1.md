@@ -6,8 +6,8 @@ claims_tested: 0
 date_executed: "2026-06-24"
 status: addendum, not a rewrite — core submission claims unchanged
 written_in_e_prime: true
+tags: [resilience]
 ---
-
 # Literature Engagement Addendum
 ## What Two Real External Papers Mean for This Submission's E-Prime Claim
 
@@ -124,6 +124,14 @@ and once without the added layer, then compare whether the two-layer version sur
 dependencies the single-layer version misses. This stands named here as a concrete,
 falsifiable extension a judge could ask this submission to run, and as the natural next build
 step this addendum's own two-layer proposal implies.
+
+**Harness built, test not yet run (2026-06-30).** `ingest.py` now contains `compare_filler_ban()`
+and a `--compare-filler-ban` CLI flag implementing exactly this comparison — it runs the
+Assessment Layer twice against the same Ingestion Layer output, once unconstrained and once
+under the filler-word ban named above, plus a compliance check confirming the ban held. No
+`ANTHROPIC_API_KEY` exists in the environment that built this harness, so the comparison
+itself remains unexecuted. This stands as a concrete next step this submission would run on
+advancing, not a claimed result.
 
 ---
 
